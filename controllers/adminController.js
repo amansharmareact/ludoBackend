@@ -6,12 +6,12 @@ const Admin = require("../models/Admin");
 exports.registerAdmin = async (req, res) => {
 
   try {
-    const { email, password } = req.body;
+    const { email, password,role="admin"} = req.body;
     let existing = await Admin.findOne({ email });
     if (existing) return res.status(400).json({ success: false, message: "Admin already exists" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const admin = new Admin({ email, password: hashedPassword });
+    const admin = new Admin({ email, password: hashedPassword,role:role });
     await admin.save();
 
     res.json({ success: true, message: "Admin registered" });
@@ -24,7 +24,6 @@ exports.registerAdmin = async (req, res) => {
 exports.loginAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(req.body);
 
     const admin = await Admin.findOne({ email });
 
@@ -35,7 +34,7 @@ exports.loginAdmin = async (req, res) => {
 
     const token = jwt.sign({ id: admin._id, email: admin.email }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
-    res.json({ success: true, token });
+    res.json({ success: true, token,role:admin.role });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

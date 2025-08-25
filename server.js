@@ -8,6 +8,7 @@ const adminRoutes = require("./route/adminRoutes");
 
 const roomRoutes = require("./route/roomRoutes");
 const Room = require("./models/room");
+const { setSocketServerInstance } = require("./controllers/roomController");
 
 const app = express();
 app.use(cors({
@@ -42,12 +43,13 @@ io.on("connection", (socket) => {
 
       io.to(code).emit("playerList", room.players);
       if (room.players.length === 2) {
-        room.status = "playing";
+        room.status = "full";
         await room.save();
         io.to(code).emit("startGame");
       }
     }
   });
+  setSocketServerInstance(io);
 
   socket.on("playerMove", ({ code, move }) => {
     socket.to(code).emit("updateBoard", move);

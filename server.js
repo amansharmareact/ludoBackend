@@ -20,7 +20,7 @@ app.use("/api", adminRoutes);
 app.use("/api", roomRoutes);
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true })
 .then(() => console.log("✅ MongoDB Connected"))
 .catch(err => console.error(err));
 
@@ -69,6 +69,9 @@ io.on("connection", (socket) => {
     console.log(`❌ Client disconnected: ${socket.id}`);
   });
 });
+
+
+console.log("MONGO_URI from env:", process.env.MONGO_URL);
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
